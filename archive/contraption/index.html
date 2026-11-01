@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The World Economy Contraption</title>
+<style>
+:root{--bg:#fbfaf7;--card:#fff;--text:#1d1d1f;--muted:#6b6b70;--border:#d9d6cf;--up:#2f6fde;--down:#e0a21b;--mix:#8a8a8f}
+@media (prefers-color-scheme:dark){:root{--bg:#141416;--card:#1e1e21;--text:#ececef;--muted:#9a9aa2;--border:#3a3a40}}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:1280px;margin:0 auto;padding:24px}
+h1{margin:0 0 6px;font-size:28px}h2{font-size:19px;margin:28px 0 10px}h3{font-size:15px;margin:0 0 8px}
+.note{border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:var(--card);margin:14px 0}
+.warn{border-left:4px solid var(--down)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+select,button{font:inherit;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer}
+button.primary{background:var(--up);color:#fff;border-color:var(--up)}button:disabled{opacity:.4;cursor:default}
+svg{width:100%;height:auto;display:block;background:var(--card);border:1px solid var(--border);border-radius:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
+.row{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--border)}.row:first-of-type{border-top:0}
+.meta{color:var(--muted);font-size:13px}.pill{font-size:12px;white-space:nowrap}
+dl{margin:0}dt{font-weight:600;margin-top:8px}dd{margin:2px 0 0}
+.node{cursor:pointer}footer{color:var(--muted);font-size:13px;margin-top:30px}
+</style></head><body><main>
+<h1>The World Economy Contraption</h1>
+<p>A 10,000-foot Rube Goldberg machine of the world economy: pick a what-if, pull the lever, and watch the effect knock through oil, shipping, chips, central banks, the dollar, prices and jobs.</p>
+<div class="note">Illustrative directional effects, not forecasts. Arrows show the usual direction and rough timing economists expect; real outcomes depend on how big and how long a shock is, and on how governments respond.</div>
+<h2>Pull a lever</h2>
+<div class="controls"><label>What if… <select id="sc"></select></label>
+<button class="primary" id="pull">Pull the lever</button><button id="next">Next step</button><button id="reset">Reset</button></div>
+<p id="blurb"></p>
+<svg id="svg" viewBox="0 0 1280 680"></svg>
+<div class="grid"><div class="card"><h3 id="stephd">Chain reaction</h3><div id="steps"></div></div>
+<div class="card"><h3 id="parthd"></h3><dl id="part"></dl></div></div>
+<h2 id="qrhd"></h2>
+<div class="note warn"><b>Not advice, not a forecast.</b> Directional rules of thumb to help sort educated guesses. Size, length and policy responses can flip any of these.</div>
+<div class="grid"><div class="card"><h3>Likely winners</h3><div id="win"></div></div><div class="card"><h3>Likely losers</h3><div id="lose"></div></div></div>
+<div class="card" style="margin-top:16px"><dl id="qr"></dl></div>
+<h2>How to read the machine</h2>
+<ol><li><b>Top row: narrow pipes.</b> Oil producers and the four sea chokepoints most trade squeezes through.</li>
+<li><b>Second row: gears, tolls and locked doors.</b> Shipping, chips, food, tariffs, trade deals and sanctions that reroute flows.</li>
+<li><b>Middle row: the big wheels.</b> US, China, EU, Japan, India and emerging markets.</li>
+<li><b>Lower rows: levers and gauges.</b> Central banks react to the inflation gauge; rates, debt, jobs and spending feed back on each other.</li></ol>
+<footer>Educational illustration only. Not financial advice and not a forecast.</footer>
+</main>
+<script>
+const W=176,H=46;
+const NODES=[
+["opec","Gulf / OPEC+",110,70,"The oil tap","A group of oil producers that agree how much crude to pump. Turning the tap up or down moves world oil prices.","Output quotas are negotiated deals, not market moves, and members sometimes cheat or quit. Oil is priced in dollars, so the tap is wired straight into the US currency."],
+["oil","Oil & energy",320,70,"The fuel tank","Powers trucks, ships, planes, factories and plastics. When it costs more, almost everything costs more a bit later.","Fuel taxes, strategic reserves, price caps on Russian oil and climate rules all reroute where energy flows and who pays."],
+["hormuz","Strait of Hormuz",530,70,"Narrow pipe #1","A thin waterway out of the Persian Gulf that carries a large share of the world's seaborne oil and LNG.","Few pipelines bypass it, so insurers, navies and shipping law decide whether tankers dare to sail."],
+["suez","Suez Canal",740,70,"Narrow pipe #2","The shortcut between Asia and Europe. If blocked, ships go around Africa, adding weeks.","Canal fees, war-risk insurance and naval escorts shape whether lines take the shortcut or the long way."],
+["panama","Panama Canal",950,70,"Narrow pipe #3","Links the Atlantic and Pacific for US trade. Drought can limit how many ships pass.","Slot auctions and water limits ration passage, pushing cargo onto US railroads instead."],
+["malacca","Strait of Malacca",1160,70,"Narrow pipe #4","The busy lane feeding China, Japan and Korea with oil and raw materials.","Shared by several countries' waters; a big reason China builds overland routes and pipelines."],
+["food","Food & fertilizer",110,200,"The kitchen","Fertilizer is made from natural gas, so energy prices end up in bread prices. Poorer countries feel it most.","Export bans, farm subsidies and sanctions on big fertilizer exporters make the route twisty."],
+["ship","Shipping & freight",320,200,"The conveyor belt","Container ships and tankers. When routes get longer or riskier, freight and insurance costs jump.","Maritime insurance, fuel-emission rules and the Jones Act (US coastal shipping must use US ships) add detours."],
+["chips","Semiconductors",530,200,"The tiny gears","Chips go into cars, phones, servers and weapons. Most advanced ones are made in Taiwan.","Export controls, subsidy laws like the US CHIPS Act and patent licensing split the supply chain into allowed and banned lanes."],
+["tariffs","Tariffs",740,200,"The toll gates","Taxes on imports. Paid at the border, mostly passed on to buyers, and they send goods on detours via third countries.","Rules of origin decide where something was 'made', so goods get finished in Vietnam or Mexico to dodge a toll."],
+["wto","WTO / USMCA deals",950,200,"The rulebook","Trade agreements that set low tolls between members and a referee for disputes.","The WTO's appeals court has been stalled since 2019; USMCA requires a share of car parts to be North American."],
+["sanctions","Sanctions & export controls",1160,200,"The locked doors","Bans on trading with certain countries or selling certain tech.","Enforced through the dollar banking system, so even non-US firms comply. Trade reroutes through middlemen countries."],
+["us","United States",110,340,"Big wheel","The world's largest consumer market and issuer of the main reserve currency.","Its laws reach abroad because global trade settles in dollars."],
+["china","China",320,340,"The factory floor","The largest manufacturer and trader of goods; buys huge amounts of oil, ore and chips.","Managed currency, capital controls and state lending steer where its money goes."],
+["eu","European Union",530,340,"The linked carriages","27 countries sharing one market, most with one currency. Big importer of energy.","Common trade policy, carbon border tax and strict deficit rules mean no country moves alone."],
+["japan","Japan",740,340,"The savings jar","A big exporter and one of the largest holders of foreign bonds. Imports almost all its energy.","Its savers' money flows abroad when Japanese rates are low, and rushes home when they rise."],
+["india","India",950,340,"The fast spinner","Fast-growing, large oil importer, and a rising alternative factory to China.","Balances between blocs, buying discounted oil while joining Western supply-chain deals."],
+["em","Emerging markets",1160,340,"The loose bolts","Brazil, Turkey, Indonesia, Africa and more. Many borrow in dollars.","IMF programs and dollar debt mean US decisions can squeeze them hardest."],
+["infl","Inflation",110,480,"The pressure gauge","How fast prices rise. Central banks watch this gauge above almost everything.","Most central banks target about 2 percent by law or mandate, so the gauge triggers levers automatically."],
+["fed","Federal Reserve",320,480,"The master lever","Sets US short-term interest rates. Because of the dollar, it tilts the whole machine.","Dual mandate: stable prices and maximum jobs, often pulling in opposite directions."],
+["ecb","European Central Bank",530,480,"The euro lever","Sets rates for the euro area, one setting for 20 very different economies.","Mandate is price stability first; treaties limit directly funding governments."],
+["pboc","People's Bank of China",740,480,"The managed valve","Guides China's rates and keeps the yuan within a band.","Answers to the government, not independent, and uses bank lending quotas as well as rates."],
+["boj","Bank of Japan",950,480,"The slow lever","Kept rates near or below zero for decades; small moves ripple worldwide via Japanese savings.","Has controlled bond yields directly at times, an unusual extra lever."],
+["usd","US dollar & Treasuries",1160,480,"The counterweight","The currency most trade and debt is priced in, and the 'safe' bond everyone runs to in a scare.","Commodities priced in dollars, and banks need dollars, so a stronger dollar tightens money everywhere."],
+["rates","Interest rates",110,620,"The friction brake","The cost of borrowing for homes, cars, companies and governments.","Bank capital rules and mortgage law decide how fast a rate change reaches households."],
+["debt","Sovereign debt",390,620,"The heavy weights","What governments owe. Higher rates make carrying it costlier and can force cuts.","EU fiscal rules, US debt ceiling fights and IMF conditions decide who must tighten belts."],
+["jobs","Jobs",670,620,"The engine room","Hiring and wages. When firms see weaker demand, they slow hiring first.","Labor laws differ: Europe often keeps workers on reduced hours, the US lays off faster."],
+["spend","Consumer spending",950,620,"The flywheel","What people buy. The biggest single part of most economies, and it feeds back into jobs.","Taxes, stimulus checks and credit rules make the flywheel spin faster or slower."]
+].map(a=>({id:a[0],label:a[1],x:a[2],y:a[3],part:a[4],what:a[5],rules:a[6]}));
+const by={};NODES.forEach(n=>by[n.id]=n);
+const LINKS=[["opec","oil"],["hormuz","oil"],["oil","ship"],["oil","food"],["suez","ship"],["panama","ship"],["malacca","china"],["ship","infl"],["food","infl"],["chips","china"],["chips","us"],["tariffs","infl"],["wto","tariffs"],["sanctions","chips"],["infl","fed"],["infl","ecb"],["fed","rates"],["fed","usd"],["usd","em"],["rates","debt"],["rates","spend"],["spend","jobs"],["jobs","spend"],["eu","ecb"],["china","pboc"],["japan","boj"],["boj","usd"],["oil","india"],["oil","japan"],["us","tariffs"],["china","em"],["debt","em"]];
+const S=(n,d,t,note)=>({n,d,t,note});
+const SC=[
+{id:"oil",name:"Oil price doubles",blurb:"OPEC+ cuts output hard and crude jumps.",steps:[S("opec","down","Day 1","The tap is turned down: less oil pumped."),S("oil","up","Days","Crude prices jump on world markets, priced in dollars."),S("ship","up","Weeks","Shipping and airfare costs rise as fuel bills climb."),S("food","up","Months","Fertilizer and transport push food prices up."),S("infl","up","1–3 months","Gas pump and grocery prices lift the inflation gauge."),S("fed","up","Months","Central banks lean toward holding or raising rates."),S("india","down","Months","Big importers like India and Japan pay more, currencies weaken."),S("spend","down","Months","Families spend more on fuel and less on everything else."),S("jobs","down","6–12 months","Slower demand means slower hiring. Oil exporters, meanwhile, gain.")],
+q:{win:["Oil and gas producers, Gulf states, Canada, Norway","Energy stocks, refiners, renewables and EVs (relatively)"],lose:["Airlines, trucking, cruise lines, chemicals","Oil importers: India, Japan, much of Europe, poorer countries"],life:"Gas and heating bills up within weeks; groceries and airfares follow over months; mortgage rates tend to stay high or rise.",watch:["OPEC+ meeting headlines and output quotas","Pump prices and diesel prices","Central bank language shifting toward 'inflation risk'"],rule:["Energy shocks hit prices fast and jobs slowly.","Oil up usually means importers' currencies down."]}},
+{id:"taiwan",name:"Taiwan chip disruption",blurb:"Advanced chip output from Taiwan is cut off.",steps:[S("chips","down","Day 1","Most advanced chip supply stops; there is no quick substitute."),S("sanctions","up","Days","Governments likely add emergency controls and sanctions."),S("china","down","Weeks","Electronics factories run out of parts as inventories drain."),S("us","down","Weeks–months","Cars, phones, servers and AI build-outs stall."),S("infl","up","Months","Scarce gadgets and cars get pricier, like the 2021 chip shortage but bigger."),S("usd","up","Days","Investors flee to dollars and Treasuries for safety."),S("em","down","Months","Asian exporters and dollar-borrowers get squeezed."),S("jobs","down","Months–years","Tech and manufacturing jobs hit; new fabs elsewhere take years to build.")],
+q:{win:["Chipmakers outside Taiwan with spare capacity (US, Korea, Japan)","Defense and security firms; safe havens like the dollar and gold"],lose:["Electronics, autos, cloud and AI companies","Taiwan, China and Asian export hubs"],life:"Phones, laptops and cars get scarce and pricier; long waits for new gear; used-car prices tend to rise.",watch:["Military or blockade news around the Taiwan Strait","Chip lead times and inventory warnings from carmakers","New export-control announcements"],rule:["No quick substitute exists for the most advanced chips.","Scarcity of one tiny part can idle a whole factory."]}},
+{id:"fed",name:"Fed cuts rates sharply",blurb:"The Fed slashes its policy rate fast.",steps:[S("fed","down","Day 1","The master lever is pulled down."),S("rates","down","Days–weeks","Mortgage and loan rates ease, though long rates may not follow fully."),S("usd","down","Days","Lower US yields make the dollar less attractive."),S("em","up","Weeks","Dollar debt gets easier to carry; money flows into emerging markets."),S("debt","down","Months–years","Government interest bills ease as debt rolls over."),S("spend","up","Months","Cheaper credit helps housing, cars and business investment."),S("jobs","up","6–18 months","Hiring improves, the usual reason for cutting."),S("infl","up","1–2 years","Risk: too much stimulus can reheat prices, pushing the lever back up later.")],
+q:{win:["Homebuilders, real estate, small businesses that borrow","Emerging markets, gold, growth stocks"],lose:["Savers in cash and money-market funds","The dollar's buying power abroad"],life:"Loan and card rates ease; mortgage rates may fall less than expected; savings yields drop; imported goods and travel abroad cost a bit more.",watch:["Why it cut: a fast cut often means the Fed sees trouble ahead","Long-term Treasury yields (do they fall too?)","Inflation reports in the following months"],rule:["Rate cuts work with a lag of many months.","Short rates follow the Fed; long rates follow inflation fears."]}},
+{id:"tariff",name:"US–China tariff hike",blurb:"Both sides raise import tolls steeply.",steps:[S("us","up","Day 1","The US raises tolls on Chinese goods; China retaliates."),S("tariffs","up","Weeks","Importers pay at the border and pass most of it on."),S("wto","mixed","Months","Disputes go to a WTO referee that can't issue final rulings, so little stops it."),S("china","down","Months","Chinese exports to the US drop; goods detour via Vietnam and Mexico."),S("pboc","down","Months","China may ease policy and let the yuan slip to cushion exporters."),S("infl","up","3–12 months","US shelf prices rise for affected goods."),S("spend","down","Months","Shoppers buy less; farmers lose export orders."),S("em","mixed","Years","Some countries win the rerouted factories, others lose demand.")],
+q:{win:["Mexico, Vietnam, India and other rerouting hubs","Domestic makers protected by the tolls"],lose:["Importers and retailers, US farmers hit by retaliation","Chinese exporters"],life:"Higher shelf prices on electronics, appliances, toys and clothes within months; fewer discounts.",watch:["Tariff lists and effective dates","Retaliation targets like soybeans and rare earths","Yuan weakening"],rule:["Buyers usually pay most of a tariff.","Trade rarely stops; it detours through third countries."]}},
+{id:"hormuz",name:"Strait of Hormuz closes",blurb:"Tanker traffic out of the Gulf halts.",steps:[S("hormuz","down","Day 1","The narrowest pipe in the machine is blocked."),S("oil","up","Hours–days","Oil and LNG prices spike; strategic reserves get released."),S("ship","up","Days","War-risk insurance soars; tankers sit idle or reroute."),S("japan","down","Weeks","Asian importers (Japan, India, China, Korea) are hit first."),S("food","up","Months","Gulf fertilizer and gas exports stop, raising farm costs."),S("infl","up","1–3 months","Energy prices feed straight into the gauge."),S("usd","up","Days","Safe-haven rush into dollars and Treasuries."),S("spend","down","Months","Recession risk climbs worldwide the longer it lasts.")],
+q:{win:["Oil producers outside the Gulf (US, Canada, Brazil, Norway)","Tanker owners, defense firms, the dollar"],lose:["Asian energy importers, airlines, chemicals and fertilizer users","Gulf exporters themselves while it lasts"],life:"Sharp jump in gas and heating prices within days; food costs rise later; recession fears grow if it lasts.",watch:["Tanker insurance rates and naval escort news","Strategic reserve releases","How many days the closure lasts"],rule:["Duration matters more than the first price spike.","Chokepoints have few bypasses, so prices jump fast."]}},
+{id:"eu",name:"Major EU recession",blurb:"Europe's economy shrinks for several quarters.",steps:[S("eu","down","Quarter 1","Output falls in the linked carriages; one slows, all slow."),S("ecb","down","Months","The ECB cuts rates to cushion the fall."),S("debt","up","Months–years","Deficits rise; EU fiscal rules limit how much weaker members can spend."),S("usd","up","Weeks","Euro weakens versus the dollar."),S("china","down","Months","China and the US sell less to Europe."),S("oil","down","Months","Less energy demand eases oil and gas prices."),S("jobs","down","6–12 months","Unemployment rises, softened by short-time work schemes."),S("em","down","Months","Suppliers in Eastern Europe, Africa and Turkey feel it.")],
+q:{win:["Buyers of European goods and travel (weaker euro)","Bond holders as rates fall"],lose:["European banks, industry and luxury exporters","China, Eastern Europe, Turkey and Africa as suppliers"],life:"For Americans: cheaper European trips and goods; slightly lower oil prices; little direct hit unless it spreads.",watch:["German factory orders and business surveys","Gap between Italian and German bond yields","ECB emergency moves"],rule:["One currency, one rate: the weakest members feel it most.","A European slowdown spreads through trade more than finance."]}},
+{id:"usd",name:"Dollar weakens sharply",blurb:"The US dollar falls against most currencies.",steps:[S("usd","down","Weeks","The counterweight lifts: the dollar buys less abroad."),S("oil","up","Weeks","Dollar-priced commodities tend to rise in dollar terms."),S("infl","up","Months","Imports cost Americans more."),S("us","up","Months","US exports get cheaper for the world; factories and farms gain."),S("em","up","Weeks","Dollar debts shrink in local terms; relief for borrowers."),S("japan","down","Months","Strong yen and euro hurt Japanese and European exporters."),S("fed","mixed","Months","Fed weighs higher import prices against a boost to growth."),S("debt","up","Years","If foreign buyers shun Treasuries, US borrowing costs rise.")],
+q:{win:["US exporters, farmers, multinationals","Emerging-market borrowers, commodities and gold"],lose:["US importers and American travelers abroad","Exporters in Japan and Europe"],life:"Imported goods and foreign trips cost more; gas may tick up; mortgage rates could rise if foreign buyers back away.",watch:["Dollar index trend","Foreign demand at Treasury auctions","Fed reaction to import prices"],rule:["Weak dollar: good for exporters, bad for importers.","Commodities tend to move opposite to the dollar."]}}];
+let sc=SC[0],step=-1,timer=null,sel="fed";
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const arrow=d=>d==="up"?"▲ up":d==="down"?"▼ down":"◆ mixed";
+const col=d=>getComputedStyle(document.documentElement).getPropertyValue(d==="up"?"--up":d==="down"?"--down":"--mix").trim();
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const curve=(a,b)=>{const mx=(a.x+b.x)/2+(b.y-a.y)*.25,my=(a.y+b.y)/2-(b.x-a.x)*.12;return `M${a.x},${a.y} Q${mx},${my} ${b.x},${b.y}`};
+function draw(){
+ const act=sc.steps.slice(0,step+1),am={};act.forEach(s=>am[s.n]=s);
+ let h="";
+ LINKS.forEach(([a,b])=>h+=`<path d="${curve(by[a],by[b])}" fill="none" stroke="${css('--border')}" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>`);
+ act.forEach((s,i)=>{if(!i)return;h+=`<path d="${curve(by[sc.steps[i-1].n],by[s.n])}" fill="none" stroke="${col(s.d)}" stroke-width="4" stroke-dasharray="10 8" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="36" to="0" dur="0.8s" repeatCount="indefinite"/></path>`});
+ if(step>=0){const s=sc.steps[step],n=by[s.n],t=n.y-H/2;h+=`<circle cx="${n.x}" cy="${t-10}" r="9" fill="${col(s.d)}"><animate attributeName="cy" values="${t-40};${t-10};${t-18};${t-10}" dur="0.7s" fill="freeze"/></circle>`}
+ NODES.forEach(n=>{const a=am[n.id],isS=sel===n.id;
+  h+=`<g class="node" data-id="${n.id}"><rect x="${n.x-W/2}" y="${n.y-H/2}" width="${W}" height="${H}" rx="10" fill="${a?col(a.d)+'33':css('--card')}" stroke="${a?col(a.d):isS?css('--text'):css('--border')}" stroke-width="${a||isS?2.5:1}"/><circle cx="${n.x-W/2+10}" cy="${n.y-H/2+10}" r="3" fill="none" stroke="${css('--muted')}"/><circle cx="${n.x+W/2-10}" cy="${n.y+H/2-10}" r="3" fill="none" stroke="${css('--muted')}"/><text x="${n.x}" y="${n.y-3}" text-anchor="middle" font-size="13" font-weight="600" fill="${css('--text')}">${esc(n.label)}</text><text x="${n.x}" y="${n.y+13}" text-anchor="middle" font-size="11" fill="${css('--muted')}">${esc(a?arrow(a.d)+" · "+a.t:n.part)}</text></g>`});
+ $("svg").innerHTML=h;
+ $("svg").querySelectorAll(".node").forEach(g=>g.onclick=()=>{sel=g.dataset.id;draw()});
+ $("stephd").textContent=step>=0?`Step ${step+1} of ${sc.steps.length}`:"Chain reaction";
+ $("steps").innerHTML=step>=0?act.map((s,i)=>`<div class="row"><b>${i+1}</b><div style="flex:1"><b>${esc(by[s.n].label)}</b> <span class="pill">${arrow(s.d)}</span><div>${esc(s.note)}</div><div class="meta">${esc(s.t)}</div></div></div>`).reverse().join(""):"<p>Pull the lever to roll the ball through the machine, one part at a time.</p>";
+ const p=by[sel];$("parthd").textContent="Part: "+p.label;
+ $("part").innerHTML=`<dt>Role</dt><dd>${esc(p.part)}</dd><dt>What it does</dt><dd>${esc(p.what)}</dd><dt>Why the path is twisty</dt><dd>${esc(p.rules)}</dd>`;
+ $("next").disabled=step>=sc.steps.length-1;$("pull").textContent=step>=0&&!timer?"Pull again":"Pull the lever";
+}
+function quick(){const q=sc.q;$("blurb").textContent=sc.blurb+" Click any part of the machine to see what it does and which rules bend its path.";$("qrhd").textContent="Quick read: "+sc.name;
+ $("win").innerHTML=q.win.map(t=>`<div class="row">${esc(t)}</div>`).join("");$("lose").innerHTML=q.lose.map(t=>`<div class="row">${esc(t)}</div>`).join("");
+ $("qr").innerHTML=`<dt>Everyday life</dt><dd>${esc(q.life)}</dd><dt>Early warning signs</dt><dd>${q.watch.map(esc).join(" · ")}</dd><dt>Rules of thumb</dt><dd>${q.rule.map(esc).join(" ")}</dd>`}
+function stop(){clearInterval(timer);timer=null}
+SC.forEach(s=>$("sc").insertAdjacentHTML("beforeend",`<option value="${s.id}">${esc(s.name)}</option>`));
+$("sc").onchange=e=>{stop();sc=SC.find(s=>s.id===e.target.value);step=-1;quick();draw()};
+$("pull").onclick=()=>{stop();step=0;timer=setInterval(()=>{if(step>=sc.steps.length-1){stop();draw();return}step++;draw()},1500);draw()};
+$("next").onclick=()=>{stop();if(step<sc.steps.length-1)step++;draw()};
+$("reset").onclick=()=>{stop();step=-1;draw()};
+quick();draw();
+</script></body></html>
