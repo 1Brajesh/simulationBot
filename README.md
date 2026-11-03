@@ -19,3 +19,6 @@ Sources: USGS Mineral Commodity Summaries 2026, Energy Institute Statistical Rev
 ## Archive
 
 See [`archive/`](archive/) for past versions: *The World Economy, Five Ways* and the original *World Economy Contraption*. Those are illustrative only, not forecasts and not financial advice.
+
+
+Map styles: metals, minerals and energy (and their L2/L3 steps) are drawn as circles sized by share of world; land, water, forests, fish, crops, meat, timber, paper, population and labor use graded shading; sunlight is shaded by solar-strength value. Every share measure outlines the smallest set of countries reaching 80% of the world total.
