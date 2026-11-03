@@ -22,3 +22,5 @@ See [`archive/`](archive/) for past versions: *The World Economy, Five Ways* and
 
 
 Map styles: metals, minerals and energy (and their L2/L3 steps) are drawn as circles sized by share of world; land, water, forests, fish, crops, meat, timber, paper, population and labor use graded shading; sunlight is shaded by solar-strength value. Every share measure outlines the smallest set of countries reaching 80% of the world total.
+
+Groups with several items (base metals, critical minerals, precious metals, fertilizer and industrial minerals, and grouped L2/L3 steps) open on an All view of small pies per country: pie area = average of the country's world shares across the items; slices = its share of each item. Chips above the map switch to a single item, with a RESERVES/MINED switch where both exist.
